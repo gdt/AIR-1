@@ -34,18 +34,6 @@ esphome:
     - priority: -100
       then:
         - script.execute: apply_ota_source
-    # Re-apply the Bluetooth Proxy switch after all components set up, so BLE
-    # scanning matches the switch state restored from flash.
-    - priority: -300
-      then:
-        - if:
-            condition:
-              switch.is_on: bluetooth_proxy_switch
-            then:
-              - esp32_ble_tracker.start_scan:
-                  continuous: true
-            else:
-              - esp32_ble_tracker.stop_scan:
 
 packages:
   # Physics-based Predicted Room Temperature/Humidity sensors and their
@@ -57,13 +45,6 @@ esp32:
   flash_size: 4MB
   framework:
     type: esp-idf
-
-esp32_ble_tracker:
-  id: ble_tracker
-  scan_parameters:
-    continuous: true
-
-bluetooth_proxy:
 
 http_request:
   verify_ssl: true
@@ -617,19 +598,6 @@ switch:
         - script.execute:
             id: setCo2AutoCalibration
             enable: false
-
-  - platform: template
-    name: "Bluetooth Proxy"
-    id: bluetooth_proxy_switch
-    icon: mdi:bluetooth
-    entity_category: "config"
-    restore_mode: ${bluetooth_proxy_restore_mode}
-    optimistic: true
-    on_turn_on:
-      - esp32_ble_tracker.start_scan:
-          continuous: true
-    on_turn_off:
-      - esp32_ble_tracker.stop_scan:
 
 select:
   - platform: template
